@@ -16,6 +16,7 @@ class DataSrv {
             ->from('{{product_category}} pc')
             ->leftJoin('{{upload}} u', 'u.entity_id = pc.id')
             ->where('u.entity = "ProductCategory"  OR u.entity_id IS NULL')
+            ->order('pc.sort')
             ->queryAll();
         $products = db()->createCommand()
             ->select('p.id, p.name, p.alias, p.price, p.category_id, p.featured, p.short_content, u.filename as image')
