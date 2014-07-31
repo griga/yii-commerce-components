@@ -14,8 +14,7 @@ class DataSrv {
 
         $categories = db()->createCommand()->select('pc.id,pc.name,pc.alias, u.filename as image')
             ->from('{{product_category}} pc')
-            ->leftJoin('{{upload}} u', 'u.entity_id = pc.id')
-            ->where('u.entity = "ProductCategory"  OR u.entity_id IS NULL')
+            ->leftJoin('{{upload}} u', 'u.id = pc.image_id')
             ->order('pc.sort')
             ->queryAll();
         $products = db()->createCommand()
@@ -41,8 +40,8 @@ class DataSrv {
     public static function getCategory($alias){
         $category = db()->createCommand()->select('pc.id,pc.name,pc.alias, u.filename as image')
             ->from('{{product_category}} pc')
-            ->leftJoin('{{upload}} u', 'u.entity_id = pc.id')
-            ->where('(u.entity = "ProductCategory"  OR u.entity_id IS NULL) AND pc.alias = :alias', [':alias' => $alias])
+            ->leftJoin('{{upload}} u', 'u.id = pc.image_id')
+            ->where('pc.alias = :alias', [':alias' => $alias])
             ->queryRow();
         $category['products'] =
             db()->createCommand()
