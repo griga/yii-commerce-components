@@ -5,6 +5,57 @@
 
 class DataSrv {
 
+    private static $_cache = [];
+
+    public static function getCategories(){
+
+        if(isset(self::$_cache['categories']))
+            return self::$_cache['categories'];
+
+        $categories = db()->createCommand()->select('pc.id,pc.name,pc.alias, u.filename as image')
+            ->from('{{product_category}} pc')
+            ->leftJoin('{{upload}} u', 'u.entity_id = pc.id')
+            ->where('u.entity = "ProductCategory"  OR u.entity_id IS NULL')
+            ->queryAll();
+        $products = db()->createCommand()
+            ->select('p.id, p.name, p.alias, p.price, p.category_id, p.featured, p.short_content, u.filename as image')
+            ->from('{{product}} p')
+            ->order('p.sort')
+            ->leftJoin('{{upload}} u', 'u.entity_id = p.id')
+            ->where('u.entity = "Product"')->queryAll();
+        foreach ($categories as &$category) {
+            if (!isset($category['products']))
+                $category['products'] = [];
+            foreach ($products as $productKey => $product) {
+                if ($product['category_id'] == $category['id']) {
+                    $category['products'][] = $product;
+                    unset($products[$productKey]);
+                }
+            }
+        }
+        self::$_cache['categories'] = $categories;
+        return $categories;
+    }
+
+    public static function getCategory($alias){
+        $category = db()->createCommand()->select('pc.id,pc.name,pc.alias, u.filename as image')
+            ->from('{{product_category}} pc')
+            ->leftJoin('{{upload}} u', 'u.entity_id = pc.id')
+            ->where('(u.entity = "ProductCategory"  OR u.entity_id IS NULL) AND pc.alias = :alias', [':alias' => $alias])
+            ->queryRow();
+        $category['products'] =
+            db()->createCommand()
+                ->select('p.id, p.name, p.alias, p.price, p.category_id, p.featured, p.short_content, u.filename as image')
+                ->from('{{product}} p')
+                ->join('{{upload}} u', 'u.entity_id = p.id')
+                ->where('u.entity = "Product"')
+                ->andWhere('p.category_id=:cid', [':cid' => $category['id']])
+                ->order('p.sort')
+                ->queryAll();
+
+        return $category;
+    }
+
     public static function getBrands(){
         $brands = db()->createCommand()->select('id,name,alias')->from('{{product_manufacturer}}')->queryAll();
         $products = db()->createCommand()
