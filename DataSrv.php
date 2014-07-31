@@ -96,7 +96,7 @@ class DataSrv {
 
     public static function getProduct($alias){
         $product = db()->createCommand()
-            ->select('p.id, p.name, p.alias, p.price, p.manufacturer_id, p.featured, p.short_content, p.content, u.filename as image')
+            ->select('p.id, p.name, p.alias, p.price, p.manufacturer_id, p.category_id, p.featured, p.short_content, p.content, u.filename as image')
             ->from('{{product}} p')
             ->join('{{upload}} u', 'u.entity_id = p.id')
             ->where('u.entity = "Product"')
