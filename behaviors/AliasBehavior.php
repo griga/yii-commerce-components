@@ -12,7 +12,7 @@ class AliasBehavior extends CActiveRecordBehavior {
     {
 
         if(!isset($_POST[get_class($this->owner)][$this->aliasAttribute]))
-            $this->owner->{$this->aliasAttribute} = StringHelper::generateAlias($this->owner->{$this->sourceAttribute});
+            $this->owner->{$this->aliasAttribute} = StringHelper::generateAlias(trim($this->owner->{$this->sourceAttribute}));
     }
 
 } 
