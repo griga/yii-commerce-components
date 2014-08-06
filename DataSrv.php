@@ -95,14 +95,15 @@ class DataSrv {
     }
 
     public static function getProduct($alias){
+
         $product = db()->createCommand()
             ->select('p.id, p.name, p.alias, p.price, p.manufacturer_id, p.category_id, p.featured, p.short_content, p.content, u.filename as image')
             ->from('{{product}} p')
-            ->join('{{upload}} u', 'u.entity_id = p.id')
-            ->where('u.entity = "Product"')
+            ->leftJoin('{{upload}} u', 'u.id = p.image_id')
             ->andWhere('p.alias=:alias', [':alias' => $alias])->queryRow();
-        $product['brand']= db()->createCommand()->select('id,name,alias')->from('{{product_manufacturer}}')->where(
-            'id='.$product['manufacturer_id']
+
+        $product['brand']= db()->createCommand()->select('id,name,alias')->from('{{product_category}}')->where(
+            'id=:id',['id'=>$product['category_id']]
         )->queryRow();
 
         return $product;
