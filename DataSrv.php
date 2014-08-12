@@ -53,6 +53,14 @@ class DataSrv {
                 ->order('p.sort')
                 ->queryAll();
 
+        foreach(db()->createCommand()
+            ->select('key, value')
+            ->from('{{custom_field}}')
+            ->where('entity = "ProductCategory" AND entity_id=:eid',[':eid'=>$category['id']])
+            ->queryAll() as $field){
+            $category[$field['key']]=$field['value'];
+        }
+
         return $category;
     }
 
