@@ -18,7 +18,7 @@ class DataSrv {
             ->order('pc.sort')
             ->queryAll();
         $products = db()->createCommand()
-            ->select('p.id, p.name, p.alias, p.price, p.category_id, p.featured, p.short_content, u.filename as image')
+            ->select('p.id, p.name, p.alias, p.price, IF(p.action_enabled = 1 AND p.action_start<=NOW() AND p.action_end>=NOW(), p.action_price, NULL) as action_price, p.category_id, p.featured, p.short_content, u.filename as image')
             ->from('{{product}} p')
             ->order('p.sort')
             ->leftJoin('{{upload}} u', 'u.entity_id = p.id')
@@ -45,7 +45,7 @@ class DataSrv {
             ->queryRow();
         $category['products'] =
             db()->createCommand()
-                ->select('p.id, p.name, p.alias, p.price, p.category_id, p.featured, p.short_content, u.filename as image')
+                ->select('p.id, p.name, p.alias, p.price, IF(p.action_enabled = 1 AND p.action_start<=NOW() AND p.action_end>=NOW(), p.action_price, NULL) as action_price, p.category_id, p.featured, p.short_content, u.filename as image')
                 ->from('{{product}} p')
                 ->join('{{upload}} u', 'u.entity_id = p.id')
                 ->where('u.entity = "Product"')
@@ -105,7 +105,7 @@ class DataSrv {
     public static function getProduct($alias){
 
         $product = db()->createCommand()
-            ->select('p.id, p.name, p.alias, p.price, p.manufacturer_id, p.category_id, p.featured, p.short_content, p.content, u.filename as image')
+            ->select('p.id, p.name, p.alias, p.price, IF(p.action_enabled = 1 AND p.action_start<=NOW() AND p.action_end>=NOW(), p.action_price, NULL) as action_price, p.manufacturer_id, p.category_id, p.featured, p.short_content, p.content, u.filename as image')
             ->from('{{product}} p')
             ->leftJoin('{{upload}} u', 'u.id = p.image_id')
             ->andWhere('p.alias=:alias', [':alias' => $alias])->queryRow();
