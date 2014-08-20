@@ -16,6 +16,19 @@ class CrudActiveRecord extends CActiveRecord {
         return CHtml::listData($models, $keyField, $valueField);
     }
 
+    public function getAsList($excludeId = false){
+        $criteria = new CDbCriteria();
+        if($excludeId){
+            if(!is_array($excludeId)){
+                $excludeId = [$excludeId];
+            }
+            $criteria->addNotInCondition('id',$excludeId);
+        }
+
+        return CHtml::listData(self::findAll($criteria),'id','name');
+    }
+
+
 
     public function getBehavior($behaviorClassName){
         foreach ($this->behaviors() as $behavior){
