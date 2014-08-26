@@ -35,6 +35,8 @@ class PureContentBehavior extends CActiveRecordBehavior
             return CHtml::image($context->getDefaultPicture()->filename, $context->name);
         } else if ($value === 'alias') {
             return $context->getGlobalLink();
+        } else if($value === 'price'){
+            return CHtml::tag('div', [],Config::get('site_currency') . $context->getAttribute($key));
         } else {
             return CHtml::tag($value, [], $context->getAttribute($key));
         }
